@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI性格测试</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            text-align: center;
+            color: #4a5568;
+            margin-bottom: 30px;
+        }
+        .question {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-left: 4px solid #667eea;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        .options {
+            display: flex;
+            gap: 15px;
+        }
+        .option {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .option:hover {
+            border-color: #667eea;
+            background: #edf2ff;
+        }
+        .option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        .submit-btn {
+            display: block;
+            width: 200px;
+            margin: 30px auto;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        .result-type {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .progress {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4a5568;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>MBTI性格测试</h1>
+        <div id="test-container">
+            <!-- Questions will be loaded here -->
+        </div>
+        <button id="submit-btn" class="submit-btn" disabled>提交测试</button>
+    </div>
+
+    <script>
+        const questionsData = {
+          "mbti_questions": [
+            {
+              "id": 1,
+              "question": "你更喜欢哪种社交方式？",
+              "options": [
+                { "text": "参加大型聚会，认识新朋友", "dimension": "E" },
+                { "text": "与一两个亲密朋友深入交谈", "dimension": "I" }
+              ]
+            },
+            {
+              "id": 2,
+              "question": "在做决定时，你更倾向于？",
+              "options": [
+                { "text": "考虑逻辑和客观事实", "dimension": "T" },
+                { "text": "考虑他人的感受和价值观", "dimension": "F" }
+              ]
+            },
+            {
+              "id": 3,
+              "question": "你如何处理日常生活？",
+              "options": [
+                { "text": "喜欢有计划、有条理", "dimension": "J" },
+                { "text": "随性而为，保持灵活性", "dimension": "P" }
+              ]
+            },
+            {
+              "id": 4,
+              "question": "你更关注什么类型的信息？",
+              "options": [
+                { "text": "具体的事实和细节", "dimension": "S" },
+                { "text": "整体模式和未来可能性", "dimension": "N" }
+              ]
+            },
+            {
+              "id": 5,
+              "question": "当你需要充电时，你会选择？",
+              "options": [
+                { "text": "外出参加活动或与人互动", "dimension": "E" },
+                { "text": "独处或安静地做自己的事", "dimension": "I" }
+              ]
+            },
+            {
+              "id": 6,
+              "question": "你更重视什么？",
+              "options": [
+                { "text": "实际经验和具体证据", "dimension": "S" },
+                { "text": "直觉和抽象概念", "dimension": "N" }
+              ]
+            },
+            {
+              "id": 7,
+              "question": "面对冲突时，你通常会？",
+              "options": [
+                { "text": "直接指出问题所在，追求公正", "dimension": "T" },
+                { "text": "试图维护和谐，照顾他人情绪", "dimension": "F" }
+              ]
+            },
+            {
+              "id": 8,
+              "question": "你更喜欢的工作环境是？",
+              "options": [
+                { "text": "结构清晰，目标明确", "dimension": "J" },
+                { "text": "开放灵活，可以随时调整", "dimension": "P" }
+              ]
+            },
+            {
+              "id": 9,
+              "question": "在团队中，你通常扮演什么角色？",
+              "options": [
+                { "text": "活跃的参与者，推动讨论", "dimension": "E" },
+                { "text": "安静的观察者，深思熟虑后发言", "dimension": "I" }
+              ]
+            },
+            {
+              "id": 10,
+              "question": "你如何学习新技能？",
+              "options": [
+                { "text": "通过实践和具体例子", "dimension": "S" },
+                { "text": "理解理论框架和原理", "dimension": "N" }
+              ]
+            },
+            {
+              "id": 11,
+              "question": "评价他人时，你更看重？",
+              "options": [
+                { "text": "能力和效率", "dimension": "T" },
+                { "text": "善意和合作精神", "dimension": "F" }
+              ]
+            },
+            {
+              "id": 12,
+              "question": "面对截止日期，你的态度是？",
+              "options": [
+                { "text": "提前完成，避免压力", "dimension": "J" },
+                { "text": "在压力下更有创造力", "dimension": "P" }
+              ]
+            },
+            {
+              "id": 13,
+              "question": "闲暇时间你更愿意？",
+              "options": [
+                { "text": "和朋友一起外出活动", "dimension": "E" },
+                { "text": "在家看书、看电影或思考", "dimension": "I" }
+              ]
+            },
+            {
+              "id": 14,
+              "question": "你更相信哪种信息来源？",
+              "options": [
+                { "text": "经过验证的事实和数据", "dimension": "S" },
+                { "text": "灵感和第六感", "dimension": "N" }
+              ]
+            },
+            {
+              "id": 15,
+              "question": "在重要决策中，你主要考虑？",
+              "options": [
+                { "text": "客观分析和利弊权衡", "dimension": "T" },
+                { "text": "对相关人员的影响", "dimension": "F" }
+              ]
+            },
+            {
+              "id": 16,
+              "question": "你的生活空间通常是？",
+              "options": [
+                { "text": "整洁有序，物品各归其位", "dimension": "J" },
+                { "text": "有些杂乱但充满创意", "dimension": "P" }
+              ]
+            },
+            {
+              "id": 17,
+              "question": "在会议中，你通常？",
+              "options": [
+                { "text": "积极发言，分享想法", "dimension": "E" },
+                { "text": "先倾听，最后才表达观点", "dimension": "I" }
+              ]
+            },
+            {
+              "id": 18,
+              "question": "你更关注？",
+              "options": [
+                { "text": "当前的现实情况", "dimension": "S" },
+                { "text": "未来的潜在机会", "dimension": "N" }
+              ]
+            },
+            {
+              "id": 19,
+              "question": "当朋友遇到困难时，你首先会？",
+              "options": [
+                { "text": "提供解决方案和建议", "dimension": "T" },
+                { "text": "表达同情和支持", "dimension": "F" }
+              ]
+            },
+            {
+              "id": 20,
+              "question": "你更喜欢的旅行方式是？",
+              "options": [
+                { "text": "详细规划每个细节", "dimension": "J" },
+                { "text": "随心所欲，边走边看", "dimension": "P" }
+              ]
+            }
+          ]
+        };
+
+        let userAnswers = {};
+        const testContainer = document.getElementById('test-container');
+        const submitBtn = document.getElementById('submit-btn');
+
+        function renderQuestions() {
+            testContainer.innerHTML = '';
+            questionsData.mbti_questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <div class="question-text">${index + 1}. ${q.question}</div>
+                    <div class="options">
+                        <div class="option" data-question="${q.id}" data-option="0">${q.options[0].text}</div>
+                        <div class="option" data-question="${q.id}" data-option="1">${q.options[1].text}</div>
+                    </div>
+                `;
+                testContainer.appendChild(questionDiv);
+            });
+
+            // Add event listeners to options
+            document.querySelectorAll('.option').forEach(option => {
+                option.addEventListener('click', handleOptionClick);
+            });
+        }
+
+        function handleOptionClick(event) {
+            const option = event.target;
+            const questionId = parseInt(option.getAttribute('data-question'));
+            const optionIndex = parseInt(option.getAttribute('data-option'));
+            
+            // Remove selected class from all options for this question
+            document.querySelectorAll(`[data-question="${questionId}"]`).forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            option.classList.add('selected');
+            
+            // Store answer
+            userAnswers[questionId] = optionIndex;
+            
+            // Check if all questions are answered
+            checkAllAnswered();
+        }
+
+        function checkAllAnswered() {
+            const totalQuestions = questionsData.mbti_questions.length;
+            const answeredQuestions = Object.keys(userAnswers).length;
+            submitBtn.disabled = answeredQuestions !== totalQuestions;
+        }
+
+        function calculateMBTI() {
+            let scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            
+            questionsData.mbti_questions.forEach(q => {
+                const selectedOption = userAnswers[q.id];
+                const dimension = q.options[selectedOption].dimension;
+                scores[dimension]++;
+            });
+            
+            const mbtiType = 
+                (scores.E > scores.I ? 'E' : 'I') +
+                (scores.S > scores.N ? 'S' : 'N') +
+                (scores.T > scores.F ? 'T' : 'F') +
+                (scores.J > scores.P ? 'J' : 'P');
+            
+            return mbtiType;
+        }
+
+        submitBtn.addEventListener('click', () => {
+            const result = calculateMBTI();
+            
+            // Send result back to AI chat
+            window.parent.postMessage({ 
+                type: "WORKFLOW_CHAT_SEND", 
+                payload: `我的MBTI测试结果是: ${result}` 
+            }, "*");
+            
+            // Show result on page
+            testContainer.innerHTML = `
+                <div class="result">
+                    <h2>测试完成！</h2>
+                    <div class="result-type">${result}</div>
+                    <p>你的MBTI性格类型是: ${result}</p>
+                    <p>结果已发送给AI助手进行进一步分析</p>
+                </div>
+            `;
+            submitBtn.style.display = 'none';
+        });
+
+        // Initialize
+        renderQuestions();
+    </script>
+</body>
+</html>
