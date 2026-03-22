@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MBTI 性格测试</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .question-container {
+            margin-bottom: 30px;
+        }
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .question-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+        .option.selected {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        .option-letter {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        .option.selected .option-letter {
+            background: white;
+            color: #667eea;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        .btn-prev {
+            background: #e0e0e0;
+            color: #666;
+        }
+        .btn-prev:hover {
+            background: #d0d0d0;
+        }
+        .btn-next {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .result-container {
+            text-align: center;
+            display: none;
+        }
+        .result-type {
+            font-size: 3em;
+            color: #667eea;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .result-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .result-description {
+            color: #666;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .traits {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .trait {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: left;
+        }
+        .trait-label {
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .trait-value {
+            color: #333;
+        }
+        .restart-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .welcome-screen {
+            text-align: center;
+        }
+        .welcome-screen p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.8;
+        }
+        .start-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 50px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: all 0.3s ease;
+        }
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧠 MBTI 性格测试</h1>
+        <p class="subtitle">发现你的性格类型</p>
+        
+        <!-- 欢迎页面 -->
+        <div class="welcome-screen" id="welcomeScreen">
+            <p>
+                MBTI（迈尔斯-布里格斯类型指标）是一种基于心理学理论的性格分类工具。<br><br>
+                这个测试包含 20 道问题，大约需要 5-10 分钟完成。<br>
+                请根据你的真实感受选择最符合你的选项，没有对错之分。
+            </p>
+            <button class="start-btn" onclick="startTest()">开始测试</button>
+        </div>
+
+        <!-- 测试页面 -->
+        <div class="test-screen hidden" id="testScreen">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            
+            <div class="question-container" id="questionContainer">
+                <!-- 问题内容将通过JS动态生成 -->
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-prev" id="prevBtn" onclick="prevQuestion()">上一题</button>
+                <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()">下一题</button>
+            </div>
+        </div>
+
+        <!-- 结果页面 -->
+        <div class="result-container" id="resultContainer">
+            <div class="result-type" id="resultType">INTJ</div>
+            <div class="result-title" id="resultTitle">建筑师</div>
+            <div class="result-description" id="resultDescription"></div>
+            
+            <div class="traits" id="traitsContainer"></div>
+            
+            <button class="restart-btn" onclick="restartTest()">重新测试</button>
+        </div>
+    </div>
+
+    <script>
+        // MBTI 问题库
+        const questions = [
+            // E/I 维度 (外向/内向)
+            {
+                dimension: 'EI',
+                question: '在社交聚会中，你通常：',
+                options: [
+                    { text: '与许多人交流，包括陌生人', value: 'E' },
+                    { text: '只与少数亲密的朋友交流', value: 'I' }
+                ]
+            },
+            {
+                dimension: 'EI',
+                question: '你更喜欢：',
+                options: [
+                    { text: '有很多朋友和社交活动', value: 'E' },
+                    { text: '有几个深交的朋友和独处时间', value: 'I' }
+                ]
+            },
+            {
+                dimension: 'EI',
+                question: '当你需要充电时，你会：',
+                options: [
+                    { text: '出去和朋友聚会', value: 'E' },
+                    { text: '独自待在家里看书或休息', value: 'I' }
+                ]
+            },
+            {
+                dimension: 'EI',
+                question: '你更倾向于：',
+                options: [
+                    { text: '先行动，再思考', value: 'E' },
+                    { text: '先思考，再行动', value: 'I' }
+                ]
+            },
+            {
+                dimension: 'EI',
+                question: '在团队中，你更喜欢：',
+                options: [
+                    { text: '积极参与讨论和发言', value: 'E' },
+                    { text: '先倾听，再选择性发言', value: 'I' }
+                ]
+            },
+            
+            // S/N 维度 (感觉/直觉)
+            {
+                dimension: 'SN',
+                question: '你更关注：',
+                options: [
+                    { text: '具体的事实和细节', value: 'S' },
+                    { text: '可能性和整体概念', value: 'N' }
+                ]
+            },
+            {
+                dimension: 'SN',
+                question: '你更喜欢学习：',
+                options: [
+                    { text: '实用的、具体的知识', value: 'S' },
+                    { text: '抽象的、理论的概念', value: 'N' }
+                ]
+            },
+            {
+                dimension: 'SN',
+                question: '当计划旅行时，你更关注：',
+                options: [
+                    { text: '酒店、交通等具体安排', value: 'S' },
+                    { text: '旅行的整体氛围和可能遇到的有趣经历', value: 'N' }
+                ]
+            },
+            {
+                dimension: 'SN',
+                question: '你更信任：',
+                options: [
+                    { text: '过去的经验和实际证据', value: 'S' },
+                    { text: '直觉和灵感', value: 'N' }
+                ]
+            },
+            {
+                dimension: 'SN',
+                question: '你更喜欢的工作方式是：',
+                options: [
+                    { text: '按部就班，遵循既定流程', value: 'S' },
+                    { text: '灵活创新，尝试新方法', value: 'N' }
+                ]
+            },
+            
+            // T/F 维度 (思考/情感)
+            {
+                dimension: 'TF',
+                question: '做决定时，你更依赖：',
+                options: [
+                    { text: '逻辑分析和客观标准', value: 'T' },
+                    { text: '个人价值观和对他人的影响', value: 'F' }
+                ]
+            },
+            {
+                dimension: 'TF',
+                question: '当朋友向你倾诉问题时，你更倾向于：',
+                options: [
+                    { text: '提供解决方案和建议', value: 'T' },
+                    { text: '提供情感支持和理解', value: 'F' }
+                ]
+            },
+            {
+                dimension: 'TF',
+                question: '在争论中，你更看重：',
+                options: [
+                    { text: '谁的观点更合理、更有逻辑', value: 'T' },
+                    { text: '维持和谐的人际关系', value: 'F' }
+                ]
+            },
+            {
+                dimension: 'TF',
+                question: '你更欣赏一个人：',
+                options: [
+                    { text: '能力强、做事高效', value: 'T' },
+                    { text: '善解人意、体贴他人', value: 'F' }
+                ]
+            },
+            {
+                dimension: 'TF',
+                question: '批评他人时，你通常会：',
+                options: [
+                    { text: '直接指出问题所在', value: 'T' },
+                    { text: '委婉表达，考虑对方感受', value: 'F' }
+                ]
+            },
+            
+            // J/P 维度 (判断/知觉)
+            {
+                dimension: 'JP',
+                question: '你的生活方式更倾向于：',
+                options: [
+                    { text: '有计划、有条理', value: 'J' },
+                    { text: '灵活、随性', value: 'P' }
+                ]
+            },
+            {
+                dimension: 'JP',
+                question: '面对截止日期，你通常：',
+                options: [
+                    { text: '提前完成，避免压力', value: 'J' },
+                    { text: '在最后期限前完成，享受紧迫感', value: 'P' }
+                ]
+            },
+            {
+                dimension: 'JP',
+                question: '你更喜欢：',
+                options: [
+                    { text: '确定性和明确的计划', value: 'J' },
+                    { text: '保持选择的开放性', value: 'P' }
+                ]
+            },
+            {
+                dimension: 'JP',
+                question: '你的桌面通常是：',
+                options: [
+                    { text: '整洁有序', value: 'J' },
+                    { text: '有些凌乱但你知道东西在哪', value: 'P' }
+                ]
+            },
+            {
+                dimension: 'JP',
+                question: '对于规则和制度，你倾向于：',
+                options: [
+                    { text: '遵守并维护秩序', value: 'J' },
+                    { text: '根据情况灵活处理', value: 'P' }
+                ]
+            }
+        ];
+
+        // MBTI 类型描述
+        const mbtiTypes = {
+            'ISTJ': { title: '检查员', description: '安静、严肃，通过全面性和可靠性获得成功。务实，实事求是。负责任。逻辑性强，一步一步地朝着目标努力，不易分心。喜欢将工作、家庭和生活中的一切安排得井井有条。重视传统和忠诚。' },
+            'ISFJ': { title: '保护者', description: '安静、友好、负责任且有良心。坚定地履行义务。周到、精确，忠诚体贴。关心他人感受，努力营造有序和谐的环境。' },
+            'INFJ': { title: '提倡者', description: '寻求思想、关系和物质财富的意义和联系。想了解是什么在激励着人们，对他人有很强的洞察力。有责任心，坚持自己的价值观。有计划、果断地实现愿景。' },
+            'INTJ': { title: '建筑师', description: '具有独创性的思想，强烈的动力去实现自己的目标和想法。能迅速看到外部事件的规律，并发展出长远的解释性观点。一旦承诺，就会组织工作并将其完成。怀疑、挑剔、独立、坚定，对自己和他人都有很高的能力标准。' },
+            'ISTP': { title: '鉴赏家', description: '宽容、灵活，是安静的观察者，直到问题出现，然后迅速行动，找到可行的解决方案。分析事物运作的原理，能够从大量数据中找出核心问题。对因果关系感兴趣，用逻辑原则组织事实，重视效率。' },
+            'ISFP': { title: '探险家', description: '安静、友好、敏感、和善。享受当下，享受周围的一切。喜欢有自己的空间，按自己的时间工作。忠于自己的价值观和对自己重要的人。不喜欢分歧和冲突，不强迫自己的意见或价值观给别人。' },
+            'INFP': { title: '调停者', description: '理想主义者，忠于自己的价值观和对自己重要的人。希望外在生活与内在价值观保持一致。好奇，能迅速看到可能性，能成为想法的催化剂。善解人意，适应力强，除非价值观受到威胁，否则很灵活。' },
+            'INTP': { title: '逻辑学家', description: '寻求发展逻辑性的解释，对理论和抽象概念感兴趣。安静、内向、灵活、适应力强。有非凡的能力专注于解决问题。怀疑，有时挑剔，总是善于分析。' },
+            'ESTP': { title: '企业家', description: '灵活、宽容，采取务实的方法以获得立竿见影的效果。对理论和概念解释感到无聊，想要精力充沛地解决问题。关注当下，自发地享受与他人在一起的时刻。通过做来学习。' },
+            'ESFP': { title: '表演者', description: '外向、友好、接受能力强。热爱生活、人类和物质享受。喜欢与人共事。在工作中运用常识和现实方法，使工作变得有趣。灵活、自发，适应新环境和与不同人共事。通过尝试新技能来学习效果最好。' },
+            'ENFP': { title: '竞选者', description: '热情洋溢、富有想象力。认为生活充满可能性。能迅速在事件和信息之间建立联系，并自信地按照自己看到的规律行事。渴望得到他人的肯定，并乐于给予赞赏和支持。自发、灵活，依靠即兴应变和语言能力。' },
+            'ENTP': { title: '辩论家', description: '反应迅速、机敏，警觉、直言不讳。善于解决新的、有挑战性的问题。擅长产生概念上的可能性，然后战略性地分析它们。善于读懂人。对例行公事感到厌倦，很少用相同的方式做同一件事，容易从一个兴趣转向另一个兴趣。' },
+            'ESTJ': { title: '总经理', description: '务实、现实、实事求是。果断，迅速采取行动实施决策。组织项目和人员以完成任务，专注于以最有效的方式获得结果。关注日常细节。有一套清晰的逻辑标准，系统地遵循它们，并希望他人也如此。' },
+            'ESFJ': { title: '执政官', description: '热心、有良心、善于合作。希望环境和谐，并决心建立这种环境。喜欢与人共事，准确按时完成任务。忠诚，即使在小事上也遵循到底。注意到别人在日常生活中的需要，并试图满足。希望自己的贡献被感激。' },
+            'ENFJ': { title: '主人公', description: '热情、有同理心、有责任感、有回应。高度适应他人的情绪、需求和动机。在每个人身上看到潜力，喜欢帮助他人实现潜能。可能成为个人或团体成长的催化剂。忠诚，对赞扬和批评都很敏感。善于交际，能促进他人，并提供鼓舞人心的领导力。' },
+            'ENTJ': { title: '指挥官', description: '坦率、果断，容易承担领导角色。能迅速看到不合逻辑和效率低下的程序和政策，制定并实施全面的系统来解决组织问题。享受长期规划和目标设定。通常消息灵通，博览群书，喜欢扩展知识并传授给他人。善于提出自己的想法。' }
+        };
+
+        let currentQuestion = 0;
+        let answers = {};
+
+        function startTest() {
+            document.getElementById('welcomeScreen').classList.add('hidden');
+            document.getElementById('testScreen').classList.remove('hidden');
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestion];
+            const container = document.getElementById('questionContainer');
+            
+            // 更新进度条
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // 生成问题HTML
+            let html = `
+                <div class="question-number">问题 ${currentQuestion + 1} / ${questions.length}</div>
+                <div class="question-text">${question.question}</div>
+                <div class="options">
+            `;
+            
+            question.options.forEach((option, index) => {
+                const selected = answers[currentQuestion] === index ? 'selected' : '';
+                html += `
+                    <div class="option ${selected}" onclick="selectOption(${index})">
+                        <div class="option-letter">${String.fromCharCode(65 + index)}</div>
+                        <div>${option.text}</div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+            
+            // 更新按钮状态
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            document.getElementById('nextBtn').textContent = 
+                currentQuestion === questions.length - 1 ? '查看结果' : '下一题';
+        }
+
+        function selectOption(index) {
+            answers[currentQuestion] = index;
+            showQuestion();
+        }
+
+        function nextQuestion() {
+            if (answers[currentQuestion] === undefined) {
+                alert('请先选择一个选项');
+                return;
+            }
+            
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion();
+            }
+        }
+
+        function showResult() {
+            // 计算MBTI类型
+            const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
+            
+            questions.forEach((q, index) => {
+                const selectedOption = q.options[answers[index]];
+                scores[selectedOption.value]++;
+            });
+            
+            let type = '';
+            type += scores.E >= scores.I ? 'E' : 'I';
+            type += scores.S >= scores.N ? 'S' : 'N';
+            type += scores.T >= scores.F ? 'T' : 'F';
+            type += scores.J >= scores.P ? 'J' : 'P';
+            
+            const result = mbtiTypes[type];
+            
+            // 显示结果
+            document.getElementById('testScreen').classList.add('hidden');
+            document.getElementById('resultContainer').style.display = 'block';
+            
+            document.getElementById('resultType').textContent = type;
+            document.getElementById('resultTitle').textContent = result.title;
+            document.getElementById('resultDescription').textContent = result.description;
+            
+            // 显示维度得分
+            const traitsHtml = `
+                <div class="trait">
+                    <div class="trait-label">能量倾向</div>
+                    <div class="trait-value">外向(E): ${scores.E} vs 内向(I): ${scores.I}</div>
+                </div>
+                <div class="trait">
+                    <div class="trait-label">认知方式</div>
+                    <div class="trait-value">实感(S): ${scores.S} vs 直觉(N): ${scores.N}</div>
+                </div>
+                <div class="trait">
+                    <div class="trait-label">决策方式</div>
+                    <div class="trait-value">思考(T): ${scores.T} vs 情感(F): ${scores.F}</div>
+                </div>
+                <div class="trait">
+                    <div class="trait-label">生活方式</div>
+                    <div class="trait-value">判断(J): ${scores.J} vs 知觉(P): ${scores.P}</div>
+                </div>
+            `;
+            document.getElementById('traitsContainer').innerHTML = traitsHtml;
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            answers = {};
+            document.getElementById('resultContainer').style.display = 'none';
+            document.getElementById('welcomeScreen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
